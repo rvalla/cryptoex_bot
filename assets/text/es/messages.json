@@ -1,0 +1,19 @@
+{
+	"bot_name": "CryptoEx Bot",
+	"hello": "Hola, soy <b>CryptoEx Bot</b>. ¡Podemos encriptar juntos algunos mensajes!",
+	"caesar_1": "Estoy listo para usar el cifrado de César. Mandame la clave (tiene que ser un número).",
+	"caesar_2": "Mandame el mensaje que querés cifrar.",
+	"caesar_3": "No puedo usar esa clave. ¿Es un número entero?",
+	"language": "¿Qué idioma querés que use?",
+	"language2": "",
+	"language3": "¡Bien! Yo también prefiero el español.",
+	"submit_error_1": "Por favor, decime con qué comando está relacionado el error que vas a reportar.",
+	"submit_error_2": "Contame brevemente de qué se trata el error que me encontraste.",
+	"submit_error_3": "Muchas gracias por tomarte un minuto para mejorarme. Esperemos que @rvalla me arregle pronto.",
+	"end_conversation": "Doy por terminada nuestra conversación.",
+	"error": "Algo salió mal. Me da un poco de vergüenza (mentira, soy un robot).",
+	"intruder": "No tenés autorización para usar este comando. Incluso no deberías conocerlo.",
+	"help": "Revisá la <i>lista de comandos</i>. Probar y equivocarse es la clave...",
+	"help2": "Podés acceder al <i>Read Me</i> <a href='https://gitlab.com/rodrigovalla/cryptoex_bot'>acá</a>.",
+	"empty": "Triste el vacío que siento"
+}
