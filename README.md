@@ -1,4 +1,4 @@
-![logo](https://gitlab.com/rodrigovalla/cryptoex/-/raw/themoststable/assets/img/icon.png)
+![logo](https://gitlab.com/rodrigovalla/cryptoex_bot/-/raw/themoststable/assets/img/icon.png)
 
 # CryptoEx: telegram bot changelog
 
