@@ -19,12 +19,12 @@ and *logging* (info, debugging or persistent) are always mandatory:
 ```
 {
 	"bot_name": "CryptoEX Bot",
-	"date": "2021-11-01",
+	"date": "2023-05-10",
 	"username": "cryptoexperiments_bot",
 	"admin_id": "A mistery",
 	"link": "https://t.me/cryptoexperiments_bot",
 	"token": "I won't tell you my token",
-	"password": "terryriley",
+	"password": "I won't tell you my password either",
 	"public_ip": "129.151.114.88",
 	"webhook": false,
 	"webhook_path": "a_webhook_url_path",
