@@ -46,3 +46,19 @@ class Text():
 			else:
 				n += 1
 		return success, n
+	
+	def caesar_by_word_cypher(self, message, language):
+		words = message.split(" ")
+		encrypted = ""
+		for w in words:
+			encrypted += self.caesar_cypher(-len(w), -len(w), w, language)
+			encrypted += " "
+		return encrypted
+	
+	def caesar_by_word_decypher(self, message, language):
+		words = message.split(" ")
+		plain = ""
+		for w in words:
+			plain += self.caesar_decypher(-len(w), -len(w), w, language)
+			plain += " "
+		return plain

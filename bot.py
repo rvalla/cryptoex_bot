@@ -16,7 +16,7 @@ en_users = set() #Saving chat ids from users who prefer english...
 us = Usage("usage.csv", "errors.csv") #The class to save activity data...
 msg = Messages() #The class to build content of text messages...
 txt = Text() #Working with text...
-CAESAR_K, CAESAR_M, ERROR_1, ERROR_2 = range(4) #The conversation states...
+CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, ERROR_1, ERROR_2 = range(6) #The conversation states...
 
 #Welcome message fot people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -27,7 +27,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #Starting a caesar cipher session...
 async def trigger_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
-	us.add_caesar()
+	us.add_caesar(0)
 	logging.info(str(hide_id(id)) + " starts caesar conversation...")
 	await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
 	return CAESAR_K
@@ -48,11 +48,51 @@ async def caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 #Recieving messages to encrypt...
 async def caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
+	us.add_caesar(1)
 	text = update.message.text
 	key = context.chat_data["caesar_key"]
-	m = txt.caesar_cypher(key, key, text, get_language(id))
+	m = ""
+	if key == 0:
+		m = txt.caesar_by_word_cypher(text, get_language(id))
+	else:
+		m = txt.caesar_cypher(key, key, text, get_language(id))
 	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
 	return CAESAR_M
+
+#Starting a caesar cipher session...
+async def trigger_de_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_de_caesar(0)
+	logging.info(str(hide_id(id)) + " starts de_caesar conversation...")
+	await context.bot.send_message(chat_id=id, text=msg.get_message("d_caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
+	return D_CAESAR_K
+
+#Asking for a caesar cipher key...
+async def de_caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	text = update.message.text
+	try:
+		the_key = int(text)
+		context.chat_data["caesar_key"] = the_key
+		await context.bot.send_message(chat_id=id, text=msg.get_message("d_caesar_2", get_language(id)), parse_mode=ParseMode.HTML)
+		return D_CAESAR_M
+	except:
+		await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_3", get_language(id)), parse_mode=ParseMode.HTML)
+		return D_CAESAR_K
+
+#Recieving messages to encrypt...
+async def de_caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_de_caesar(1)
+	text = update.message.text
+	key = context.chat_data["caesar_key"]
+	m = ""
+	if key == 0:
+		m = txt.caesar_by_word_decypher(text, get_language(id))
+	else:
+		m = txt.caesar_decypher(key, key, text, get_language(id))
+	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	return D_CAESAR_M
 
 #Starting an error report session...
 async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -60,7 +100,7 @@ async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYP
 	logging.info(str(hide_id(id)) + " wants to report an error...")
 	await context.bot.send_message(chat_id=id, text=msg.get_apology(get_language(id)), parse_mode=ParseMode.HTML)
 	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_1", get_language(id)), parse_mode=ParseMode.HTML)
-	return ERROR1
+	return ERROR_1
 
 #Saving error related command...
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -68,7 +108,7 @@ async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	m = update.message.text
 	context.chat_data["error_command"] = m
 	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_2", get_language(id)), parse_mode=ParseMode.HTML)
-	return ERROR2
+	return ERROR_2
 
 #Saving error description...
 async def report_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -125,6 +165,28 @@ async def set_language(update: Update, context: ContextTypes.DEFAULT_TYPE, query
 		en_users.discard(id)
 		await context.bot.send_message(chat_id=id, text=msg.get_message("language3", get_language(id)), parse_mode=ParseMode.HTML)
 
+#Sending usage data...
+async def bot_usage(update, context):
+	id = update.effective_chat.id
+	m = update.message.text.split(" ")
+	if len(m) > 1 and m[1] == config["password"]:
+		m = us.build_usage_message()
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	else:
+		logging.info(hide_id(id) + " wanted to check bot usage data...")
+		await context.bot.send_message(chat_id=id, text=msg.get_message("intruder", get_language(id)), parse_mode=ParseMode.HTML)
+
+#Saving usage data...
+async def save_usage(update, context):
+	id = update.effective_chat.id
+	m = update.message.text.split(" ")
+	if len(m) > 1 and m[1] == config["password"]:
+		us.save_usage()
+		await context.bot.send_message(chat_id=id, text="¡Datos guardados!", parse_mode=ParseMode.HTML)
+	else:
+		logging.info(hide_id(id) + " wanted to save bot usage data...")
+		await context.bot.send_message(chat_id=id, text=msg.get_message("intruder", get_language(id)), parse_mode=ParseMode.HTML)
+
 #Processing button clicks...
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	query = update.callback_query
@@ -148,11 +210,14 @@ def hide_id(id):
 def build_conversation_handler():
 	print("Building conversation handler...", end="\n")
 	handler = ConversationHandler(
-		entry_points=[CommandHandler("caesar", trigger_caesar),CommandHandler("error", trigger_error_submit)],
+		entry_points=[CommandHandler("caesar", trigger_caesar), CommandHandler("de_caesar", trigger_de_caesar),
+					CommandHandler("error", trigger_error_submit)],
 		states={
 			CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_key)],
 			CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_message)],
-			ERROR_1: [MessageHandler(filters.TEXT, report_command)],
+			D_CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_caesar_key)],
+			D_CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_caesar_message)],
+			ERROR_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_command)],
 			ERROR_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
 		},
 		fallbacks=[MessageHandler(filters.COMMAND, end_conversation)]
@@ -171,6 +236,8 @@ def main() -> None:
 	#app.add_error_handler(error_notification)
 	app.add_handler(CommandHandler("start", start), group=2)
 	app.add_handler(CommandHandler("language", select_language), group=2)
+	app.add_handler(CommandHandler("botusage", bot_usage), group=2)
+	app.add_handler(CommandHandler("saveusage", save_usage), group=2)
 	app.add_handler(CommandHandler("help", print_help), group=2)
 	app.add_handler(CallbackQueryHandler(button_click), group=2)
 	app.add_handler(build_conversation_handler(), group=1)

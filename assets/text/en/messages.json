@@ -4,6 +4,8 @@
 	"caesar_1": "Send me a number key to use.",
 	"caesar_2": "Send me the text to cipher.",
 	"caesar_3": "I can't understand your key. Is that a whole number?",
+	"d_caesar_1": "Send me the key used to cipher the message.",
+	"d_caesar_2": "Send me the text to decipher.",
 	"language": "Please, select your prefered language.",
 	"language2": "Note that this bot does not store any persistent data from you. If the bot is restarted it will be forget your preference. In that case, be patient and send <b>/language</b> again.",
 	"language3": "I will try speak en english now...",

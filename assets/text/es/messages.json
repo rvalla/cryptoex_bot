@@ -4,6 +4,8 @@
 	"caesar_1": "Estoy listo para usar el cifrado de César. Mandame la clave (tiene que ser un número).",
 	"caesar_2": "Mandame el mensaje que querés cifrar.",
 	"caesar_3": "No puedo usar esa clave. ¿Es un número entero?",
+	"d_caesar_1": "Estoy listo para descifrar mensajes. Mandame la clave con la que el mensaje fue cifrado (tiene que ser un número).",
+	"d_caesar_2": "Mandame el mensaje que querés descifrar.",
 	"language": "¿Qué idioma querés que use?",
 	"language2": "",
 	"language3": "¡Bien! Yo también prefiero el español.",

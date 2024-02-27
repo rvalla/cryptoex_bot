@@ -2,6 +2,11 @@
 
 # CryptoEx: telegram bot changelog
 
+## 2024-02-26: v0.2 beta
+
+New **/de_caesar** command. Working in something fun when key is 0. New *secrets
+commands* to check bot usage. New **/error** command to allow users to report errors.  
+
 ## 2023-05-09: v0.1 alpha
 
 Starting with the bot. Testing first commands. Working on Caesar cipher.  
