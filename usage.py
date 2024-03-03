@@ -14,6 +14,8 @@ class Usage():
 		self.start = 0
 		self.caesar = [0,0] #conversations, messages
 		self.de_caesar = [0,0]
+		self.mirror = [0,0]
+		self.de_mirror = [0,0]
 		self.error_reports = 0
 		self.language = [0,0] #spanish, english...
 		self.help = 0
@@ -26,6 +28,8 @@ class Usage():
 			"start: " + str(self.start) + "\n" + \
 			"caesar: " + str(self.caesar) + "\n" + \
 			"de_caesar:" + str(self.de_caesar) + "\n" + \
+			"mirror: " + str(self.mirror) + "\n" + \
+			"de_mirror:" + str(self.de_mirror) + "\n" + \
 			"error reports: " + str(self.error_reports) + "\n" + \
 			"language: " + str(self.language) + "\n" + \
 			"help: " + str(self.help) + "\n" + \
@@ -52,6 +56,8 @@ class Usage():
 		line += str(self.start) + ";"
 		line += str(self.caesar) + ";"
 		line += str(self.de_caesar) + ";"
+		line += str(self.mirror) + ";"
+		line += str(self.de_mirror) + ";"
 		line += str(self.error_reports) + ";"
 		line += str(self.language) + ";"
 		line += str(self.help) + ";"
@@ -70,6 +76,14 @@ class Usage():
 	#Registering a new de_caesar conversation...
 	def add_de_caesar(self, key):
 		self.de_caesar[key] += 1
+	
+	#Registering a new mirror conversation...
+	def add_mirror(self, key):
+		self.mirror[key] += 1
+	
+	#Registering a new de_mirror conversation...
+	def add_de_mirror(self, key):
+		self.de_mirror[key] += 1
 	
 	#Registering a new error report...
 	def add_error_report(self):
@@ -101,3 +115,9 @@ class Usage():
 		file.write(description)
 		file.write(user + "\n")
 		file.close()
+	
+	def __str__(self):
+		return "- CryptoEX Bot\n" + \
+				"  I am the class in charge of working with usage data...\n" + \
+				"  gitlab.com/rodrigovalla/cryptoex_bot\n" + \
+				"  rodrigovalla@protonmail.ch"

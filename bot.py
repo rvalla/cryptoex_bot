@@ -16,7 +16,7 @@ en_users = set() #Saving chat ids from users who prefer english...
 us = Usage("usage.csv", "errors.csv") #The class to save activity data...
 msg = Messages() #The class to build content of text messages...
 txt = Text() #Working with text...
-CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, ERROR_1, ERROR_2 = range(6) #The conversation states...
+CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, MIRROR_K, MIRROR_M, D_MIRROR_K, D_MIRROR_M, ERROR_1, ERROR_2 = range(10) #The conversation states...
 
 #Welcome message fot people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -28,6 +28,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def trigger_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
 	us.add_caesar(0)
+	context.chat_data["command"] = "caesar"
 	logging.info(str(hide_id(id)) + " starts caesar conversation...")
 	await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
 	return CAESAR_K
@@ -57,17 +58,20 @@ async def caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	else:
 		m = txt.caesar_cypher(key, key, text, get_language(id))
 	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-	return CAESAR_M
+	m = msg.get_message("end_cypher", get_language(id)) + context.chat_data["command"] + "."
+	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	return ConversationHandler.END
 
-#Starting a caesar cipher session...
+#Starting a caesar decipher session...
 async def trigger_de_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
 	us.add_de_caesar(0)
 	logging.info(str(hide_id(id)) + " starts de_caesar conversation...")
+	context.chat_data["command"] = "de_caesar"
 	await context.bot.send_message(chat_id=id, text=msg.get_message("d_caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
 	return D_CAESAR_K
 
-#Asking for a caesar cipher key...
+#Asking for a caesar decipher key...
 async def de_caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
 	text = update.message.text
@@ -80,7 +84,7 @@ async def de_caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 		await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_3", get_language(id)), parse_mode=ParseMode.HTML)
 		return D_CAESAR_K
 
-#Recieving messages to encrypt...
+#Recieving messages to decrypt...
 async def de_caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
 	us.add_de_caesar(1)
@@ -92,7 +96,77 @@ async def de_caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 	else:
 		m = txt.caesar_decypher(key, key, text, get_language(id))
 	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-	return D_CAESAR_M
+	m = msg.get_message("end_decypher", get_language(id)) + context.chat_data["command"] + "."
+	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	return ConversationHandler.END
+
+#Starting a mirror cipher session...
+async def trigger_mirror(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_mirror(0)
+	context.chat_data["command"] = "mirror"
+	logging.info(str(hide_id(id)) + " starts mirror conversation...")
+	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_1", get_language(id)), parse_mode=ParseMode.HTML)
+	return MIRROR_K
+
+#Asking for a mirror cipher key...
+async def mirror_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	text = update.message.text
+	context.chat_data["mirror_key"] = text
+	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_2", get_language(id)), parse_mode=ParseMode.HTML)
+	return MIRROR_M
+
+#Recieving messages to encrypt...
+async def mirror_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_mirror(1)
+	text = update.message.text
+	key = context.chat_data["mirror_key"]
+	m = ""
+	try:
+		m = txt.mirror_cypher(key, text)
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		m = msg.get_message("end_cypher", get_language(id)) + context.chat_data["command"] + "."
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		return ConversationHandler.END
+	except:
+		await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_3", get_language(id)), parse_mode=ParseMode.HTML)
+		return MIRROR_M
+
+#Starting a mirror decipher session...
+async def trigger_de_mirror(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_de_mirror(0)
+	logging.info(str(hide_id(id)) + " starts de_mirror conversation...")
+	context.chat_data["command"] = "de_mirror"
+	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_1", get_language(id)), parse_mode=ParseMode.HTML)
+	return D_MIRROR_K
+
+#Asking for a mirror decipher key...
+async def de_mirror_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	text = update.message.text
+	context.chat_data["mirror_key"] = text
+	await context.bot.send_message(chat_id=id, text=msg.get_message("d_mirror_2", get_language(id)), parse_mode=ParseMode.HTML)
+	return D_MIRROR_M
+
+#Recieving messages to decrypt...
+async def de_mirror_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_de_mirror(1)
+	text = update.message.text
+	key = context.chat_data["mirror_key"]
+	m = ""
+	try:
+		m = txt.mirror_decypher(key, text)
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		m = msg.get_message("end_decypher", get_language(id)) + context.chat_data["command"] + "."
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		return ConversationHandler.END
+	except:
+		await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_3", get_language(id)), parse_mode=ParseMode.HTML)
+		return D_MIRROR_M
 
 #Starting an error report session...
 async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -211,12 +285,17 @@ def build_conversation_handler():
 	print("Building conversation handler...", end="\n")
 	handler = ConversationHandler(
 		entry_points=[CommandHandler("caesar", trigger_caesar), CommandHandler("de_caesar", trigger_de_caesar),
+					CommandHandler("mirror", trigger_mirror), CommandHandler("de_mirror", trigger_de_mirror),
 					CommandHandler("error", trigger_error_submit)],
 		states={
 			CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_key)],
 			CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_message)],
 			D_CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_caesar_key)],
 			D_CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_caesar_message)],
+			MIRROR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, mirror_key)],
+			MIRROR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, mirror_message)],
+			D_MIRROR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_mirror_key)],
+			D_MIRROR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_mirror_message)],
 			ERROR_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_command)],
 			ERROR_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
 		},

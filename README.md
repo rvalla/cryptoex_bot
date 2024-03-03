@@ -7,8 +7,9 @@ It is related to [CryptoEX](https://gitlab.com/rodrigovalla/cryptoex) and [Crypt
 
 ## online status
 
-**CryptoEX Bot** is not currently deployed. It will be available during some moments of the week while I run
-some tests. Stay tuned!  
+**CryptoEX Bot** is currently deployed in a *virtual machine* from
+[Oracle Cloud Infrastructure](https://www.oracle.com/cloud/). It will be online most of the time,
+when I am not working in it.  
 
 ## running the code
 

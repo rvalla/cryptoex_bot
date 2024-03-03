@@ -2,6 +2,12 @@
 
 # CryptoEx: telegram bot changelog
 
+## 2024-03-03: v0.3 beta
+
+New *mirror cypher* commands (**/mirror** and **/de_mirror**).  
+Cypher conversations termitates automaticaly after one cycle now (better to
+select different keys).  
+
 ## 2024-02-26: v0.2 beta
 
 New **/de_caesar** command. Working in something fun when key is 0. New *secrets

@@ -8,7 +8,8 @@ class Text():
 		self.digits = self.config["digits"].split(",")
 		self.alpha_caesar_es = self.config["caesar_es"].split(",")
 		self.alpha_caesar_en = self.config["caesar_en"].split(",")
-		
+	
+	#Encrypting and decrypting a message with Caesar cipher...
 	def caesar_cypher(self, key, nkey, message, language):
 		msg = message.upper()
 		encrypted = ""
@@ -62,3 +63,28 @@ class Text():
 			plain += self.caesar_decypher(-len(w), -len(w), w, language)
 			plain += " "
 		return plain
+	
+	#Encrypting and decrypting a message reversing symbol's order...
+	def mirror_cypher(self, key, message):
+		msg = message.replace(" ", "+")
+		k = key.replace(" ", "+")
+		m = self.mirror_string(k, msg.split(k))
+		return m
+
+	def mirror_string(self, key, links):
+		m = ""
+		for l in links:
+			m += l[::-1]
+			m += key
+		return m[:len(m)-len(key)]
+	
+	def mirror_decypher(self, key, message):
+		k = key.replace(" ", "+")
+		m = self.mirror_string(key, message.split(k))
+		return m.replace("+", " ")
+
+	def __str__(self):
+		return "- CryptoEX Bot\n" + \
+				"  I am the class in charge of encrypting and decrypting text...\n" + \
+				"  gitlab.com/rodrigovalla/cryptoex_bot\n" + \
+				"  rodrigovalla@protonmail.ch"

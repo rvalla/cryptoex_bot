@@ -4,8 +4,14 @@
 	"caesar_1": "Estoy listo para usar el cifrado de César. Mandame la clave (tiene que ser un número).",
 	"caesar_2": "Mandame el mensaje que querés cifrar.",
 	"caesar_3": "No puedo usar esa clave. ¿Es un número entero?",
-	"d_caesar_1": "Estoy listo para descifrar mensajes. Mandame la clave con la que el mensaje fue cifrado (tiene que ser un número).",
+	"mirror_1": "Mandame una cadena de símbolos para saber por dónde cortar el mensaje en pedazos (asegurate que esté en el mensaje).",
+	"mirror_2": "Mandame el mensaje que querés cifrar.",
+	"d_mirror_2": "Mandame el mensaje que querés descifrar.",
+	"mirror_3": "No pude con eso. Parece que hay un error.",
+	"d_caesar_1": "Estoy listo para descifrar un mensaje. Mandame la clave con la que el mensaje fue cifrado (tiene que ser un número).",
 	"d_caesar_2": "Mandame el mensaje que querés descifrar.",
+	"end_cypher": "Listo. Para cifrar un nuevo mensaje mandá /",
+	"end_decypher": "Listo. Para descifrar un nuevo mensaje mandá /",
 	"language": "¿Qué idioma querés que use?",
 	"language2": "",
 	"language3": "¡Bien! Yo también prefiero el español.",
@@ -17,5 +23,5 @@
 	"intruder": "No tenés autorización para usar este comando. Incluso no deberías conocerlo.",
 	"help": "Revisá la <i>lista de comandos</i>. Probar y equivocarse es la clave...",
 	"help2": "Podés acceder al <i>Read Me</i> <a href='https://gitlab.com/rodrigovalla/cryptoex_bot'>acá</a>.",
-	"empty": "Triste el vacío que siento"
+	"empty": "Triste el vacío que siento..."
 }

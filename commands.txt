@@ -1,5 +1,7 @@
 start - Primero te saludo.
 caesar - Usemos el cifrado del César.
 de_caesar - Revirtamos el cifrado del César.
+mirror - Cifremos invirtiento el texto.
+de_mirror - Revirtamos el cifrado en espejo.
 language - Decidí qué idioma uso.
 help - Puedo intentar ayudarte...

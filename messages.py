@@ -45,3 +45,9 @@ class Messages():
 			return rd.choice(self.r_outofcontext_es)
 		else:
 			return rd.choice(self.r_outofcontext_en)
+	
+	def __str__(self):
+		return "- CryptoEX Bot\n" + \
+				"  I am the class in charge of working with text messages...\n" + \
+				"  gitlab.com/rodrigovalla/cryptoex_bot\n" + \
+				"  rodrigovalla@protonmail.ch"
