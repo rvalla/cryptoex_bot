@@ -12,6 +12,8 @@
 	"d_caesar_2": "Mandame el mensaje que querés descifrar.",
 	"end_cypher": "Listo. Para cifrar un nuevo mensaje mandá /",
 	"end_decypher": "Listo. Para descifrar un nuevo mensaje mandá /",
+	"levenshtein_1": "¡Vamos a medir distancia entre palabras!",
+	"levenshtein_2": "No puedo hacer nada con eso.",
 	"language": "¿Qué idioma querés que use?",
 	"language2": "",
 	"language3": "¡Bien! Yo también prefiero el español.",
@@ -21,6 +23,7 @@
 	"end_conversation": "Doy por terminada nuestra conversación.",
 	"error": "Algo salió mal. Me da un poco de vergüenza (mentira, soy un robot).",
 	"intruder": "No tenés autorización para usar este comando. Incluso no deberías conocerlo.",
+	"privacy": "¡No tenés que preocuparte por mí! Sólo guardo tu preferencia de idioma. No recuerdo ni siquiera tu nombre de usuario (asocio tu elección al id del chat).",
 	"help": "Revisá la <i>lista de comandos</i>. Probar y equivocarse es la clave...",
 	"help2": "Podés acceder al <i>Read Me</i> <a href='https://gitlab.com/rodrigovalla/cryptoex_bot'>acá</a>.",
 	"empty": "Triste el vacío que siento..."

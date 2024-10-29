@@ -16,7 +16,7 @@ en_users = set() #Saving chat ids from users who prefer english...
 us = Usage("usage.csv", "errors.csv") #The class to save activity data...
 msg = Messages() #The class to build content of text messages...
 txt = Text() #Working with text...
-CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, MIRROR_K, MIRROR_M, D_MIRROR_K, D_MIRROR_M, ERROR_1, ERROR_2 = range(10) #The conversation states...
+CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, MIRROR_K, MIRROR_M, D_MIRROR_K, D_MIRROR_M, LEVENSHTEIN, ERROR_1, ERROR_2 = range(11) #The conversation states...
 
 #Welcome message fot people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -168,6 +168,31 @@ async def de_mirror_message(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 		await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_3", get_language(id)), parse_mode=ParseMode.HTML)
 		return D_MIRROR_M
 
+#Starting a Levenshtein session...
+async def trigger_levenshtein(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_levenshtein(0)
+	await context.bot.send_message(chat_id=id, text=msg.get_message("levenshtein_1", get_language(id)), parse_mode=ParseMode.HTML)
+	return LEVENSHTEIN
+
+#Recieving messages to measure Levenshtein distance...
+async def levenshtein_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	us.add_levenshtein(1)
+	words = update.message.text.split(" ")
+	if len(words) > 1:
+		if len(words) == 2:
+			d = txt.levenshtein_distance(words[0], words[1])
+			m = msg.levenshtein_distance_message(words[0], words[1], d, get_language(id))
+			await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		else:
+			a = txt.levenshtein_analysis(words)
+			m = msg.levenshtein_analysis_message(words, a, get_language(id))
+			await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	else:
+		await context.bot.send_message(chat_id=id, text=msg.get_message("levenshtein_2", get_language(id)), parse_mode=ParseMode.HTML)
+	return LEVENSHTEIN 
+
 #Starting an error report session...
 async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	id = update.effective_chat.id
@@ -203,6 +228,12 @@ async def end_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 	logging.info(str(hide_id(id)) + " endss a conversation...")
 	await context.bot.send_message(chat_id=id, text=msg.get_message("end_conversation", get_language(id)), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
+
+#Printing privacy command...
+async def print_privacy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+	id = update.effective_chat.id
+	logging.info(str(hide_id(id)) + " checked privacy policy...")
+	await context.bot.send_message(chat_id=id, text=msg.get_message("privacy", get_language(id)), parse_mode=ParseMode.HTML)
 
 #Printing help command...
 async def print_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -286,7 +317,7 @@ def build_conversation_handler():
 	handler = ConversationHandler(
 		entry_points=[CommandHandler("caesar", trigger_caesar), CommandHandler("de_caesar", trigger_de_caesar),
 					CommandHandler("mirror", trigger_mirror), CommandHandler("de_mirror", trigger_de_mirror),
-					CommandHandler("error", trigger_error_submit)],
+					CommandHandler("levenshtein", trigger_levenshtein), CommandHandler("error", trigger_error_submit)],
 		states={
 			CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_key)],
 			CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_message)],
@@ -296,6 +327,7 @@ def build_conversation_handler():
 			MIRROR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, mirror_message)],
 			D_MIRROR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_mirror_key)],
 			D_MIRROR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, de_mirror_message)],
+			LEVENSHTEIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, levenshtein_message)],
 			ERROR_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_command)],
 			ERROR_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
 		},
@@ -317,6 +349,7 @@ def main() -> None:
 	app.add_handler(CommandHandler("language", select_language), group=2)
 	app.add_handler(CommandHandler("botusage", bot_usage), group=2)
 	app.add_handler(CommandHandler("saveusage", save_usage), group=2)
+	app.add_handler(CommandHandler("privacy", print_privacy), group=2)
 	app.add_handler(CommandHandler("help", print_help), group=2)
 	app.add_handler(CallbackQueryHandler(button_click), group=2)
 	app.add_handler(build_conversation_handler(), group=1)

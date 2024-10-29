@@ -45,6 +45,29 @@ class Messages():
 			return rd.choice(self.r_outofcontext_es)
 		else:
 			return rd.choice(self.r_outofcontext_en)
+
+	def levenshtein_distance_message(self, word_a, word_b, d, l):
+		m = ""
+		if l == 0:
+			m += "La distancia de Levenshtein entre <b>" + word_a.upper() + "</b> y <b>"
+			m += word_b.upper() + "</b> es <b>" + str(d) + "</b>."
+		else:
+			m += "The Levenshtein distance between <b>" + word_a.upper() + "</b> y <b>"
+			m += word_b.upper() + "</b> is <b>" + str(d) + "</b>."
+		return m
+
+	def levenshtein_analysis_message(self, words, analysis, l):
+		m = ""
+		if l == 0:
+			m += "Comparto mi análisis en una tabla:\n\n"
+		else:
+			m += "I share my analysis in the next table:\n\n"
+		for w, a in zip(words, analysis):
+			m += "<b>" + w.upper() + "</b>: "
+			m += str(a[0]) + ", "
+			m += str(a[1]) + ", "
+			m += str(a[2]) + "\n"
+		return m
 	
 	def __str__(self):
 		return "- CryptoEX Bot\n" + \

@@ -16,6 +16,7 @@ class Usage():
 		self.de_caesar = [0,0]
 		self.mirror = [0,0]
 		self.de_mirror = [0,0]
+		self.levenshtein = [0,0]
 		self.error_reports = 0
 		self.language = [0,0] #spanish, english...
 		self.help = 0
@@ -29,7 +30,8 @@ class Usage():
 			"caesar: " + str(self.caesar) + "\n" + \
 			"de_caesar:" + str(self.de_caesar) + "\n" + \
 			"mirror: " + str(self.mirror) + "\n" + \
-			"de_mirror:" + str(self.de_mirror) + "\n" + \
+			"de_mirror: " + str(self.de_mirror) + "\n" + \
+			"levenshtein: " + str(self.levenshtein) + "\n" + \
 			"error reports: " + str(self.error_reports) + "\n" + \
 			"language: " + str(self.language) + "\n" + \
 			"help: " + str(self.help) + "\n" + \
@@ -58,6 +60,7 @@ class Usage():
 		line += str(self.de_caesar) + ";"
 		line += str(self.mirror) + ";"
 		line += str(self.de_mirror) + ";"
+		line += str(self.levenshtein) + ";"
 		line += str(self.error_reports) + ";"
 		line += str(self.language) + ";"
 		line += str(self.help) + ";"
@@ -84,6 +87,10 @@ class Usage():
 	#Registering a new de_mirror conversation...
 	def add_de_mirror(self, key):
 		self.de_mirror[key] += 1
+
+	#Registering a new levenshtein conversation...
+	def add_levenshtein(self, key):
+		self.levenshtein[key] += 1
 	
 	#Registering a new error report...
 	def add_error_report(self):

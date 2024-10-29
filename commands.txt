@@ -3,5 +3,7 @@ caesar - Usemos el cifrado del César.
 de_caesar - Revirtamos el cifrado del César.
 mirror - Cifremos invirtiento el texto.
 de_mirror - Revirtamos el cifrado en espejo.
+levenshtein - Midamos distancia entre palabras.
 language - Decidí qué idioma uso.
+privacy - No guardo tus datos.
 help - Puedo intentar ayudarte...
