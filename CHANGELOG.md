@@ -2,6 +2,12 @@
 
 # CryptoEx: telegram bot changelog
 
+## 2024-11-04: v0.4 beta
+
+New **/levenshtein** command to work with distance between words. Adding
+**/privacy** command to comply with [Telegram policy](https://telegram.org/tos/bot-developers).
+The new secret command **/admin** offers buttons to check or save bot usage.   
+
 ## 2024-03-03: v0.3 beta
 
 New *mirror cypher* commands (**/mirror** and **/de_mirror**).  

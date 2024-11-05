@@ -5,6 +5,7 @@ from telegram.ext import (
 )
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from datetime import datetime as dt, timedelta
 import traceback, logging
 import json as js
 from messages import Messages
@@ -16,234 +17,255 @@ en_users = set() #Saving chat ids from users who prefer english...
 us = Usage("usage.csv", "errors.csv") #The class to save activity data...
 msg = Messages() #The class to build content of text messages...
 txt = Text() #Working with text...
-CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, MIRROR_K, MIRROR_M, D_MIRROR_K, D_MIRROR_M, LEVENSHTEIN, ERROR_1, ERROR_2 = range(11) #The conversation states...
+CAESAR_K, CAESAR_M, D_CAESAR_K, D_CAESAR_M, MIRROR_K, MIRROR_M, D_MIRROR_K, D_MIRROR_M, LEVENSHTEIN, ERROR_1, ERROR_2, ADMIN = range(12) #The conversation states...
 
 #Welcome message fot people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " started the bot...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("hello", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " started the bot...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("hello", get_language(chat_id)), parse_mode=ParseMode.HTML)
 
 #Starting a caesar cipher session...
 async def trigger_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_caesar(0)
 	context.chat_data["command"] = "caesar"
-	logging.info(str(hide_id(id)) + " starts caesar conversation...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
+	logging.info(str(hide_id(chat_id)) + " starts caesar conversation...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("caesar_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return CAESAR_K
 
 #Asking for a caesar cipher key...
 async def caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	text = update.message.text
 	try:
 		the_key = int(text)
 		context.chat_data["caesar_key"] = the_key
-		await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_2", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("caesar_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return CAESAR_M
 	except:
-		await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_3", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("caesar_3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return CAESAR_K
 
 #Recieving messages to encrypt...
 async def caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_caesar(1)
 	text = update.message.text
 	key = context.chat_data["caesar_key"]
 	m = ""
 	if key == 0:
-		m = txt.caesar_by_word_cypher(text, get_language(id))
+		m = txt.caesar_by_word_cypher(text, get_language(chat_id))
 	else:
-		m = txt.caesar_cypher(key, key, text, get_language(id))
-	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-	m = msg.get_message("end_cypher", get_language(id)) + context.chat_data["command"] + "."
-	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		m = txt.caesar_cypher(key, key, text, get_language(chat_id))
+	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+	m = msg.get_message("end_cypher", get_language(chat_id)) + context.chat_data["command"] + "."
+	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
 #Starting a caesar decipher session...
 async def trigger_de_caesar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_de_caesar(0)
-	logging.info(str(hide_id(id)) + " starts de_caesar conversation...")
+	logging.info(str(hide_id(chat_id)) + " starts de_caesar conversation...")
 	context.chat_data["command"] = "de_caesar"
-	await context.bot.send_message(chat_id=id, text=msg.get_message("d_caesar_1", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("d_caesar_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return D_CAESAR_K
 
 #Asking for a caesar decipher key...
 async def de_caesar_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	text = update.message.text
 	try:
 		the_key = int(text)
 		context.chat_data["caesar_key"] = the_key
-		await context.bot.send_message(chat_id=id, text=msg.get_message("d_caesar_2", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("d_caesar_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return D_CAESAR_M
 	except:
-		await context.bot.send_message(chat_id=id, text=msg.get_message("caesar_3", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("caesar_3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return D_CAESAR_K
 
 #Recieving messages to decrypt...
 async def de_caesar_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_de_caesar(1)
 	text = update.message.text
 	key = context.chat_data["caesar_key"]
 	m = ""
 	if key == 0:
-		m = txt.caesar_by_word_decypher(text, get_language(id))
+		m = txt.caesar_by_word_decypher(text, get_language(chat_id))
 	else:
-		m = txt.caesar_decypher(key, key, text, get_language(id))
-	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-	m = msg.get_message("end_decypher", get_language(id)) + context.chat_data["command"] + "."
-	await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		m = txt.caesar_decypher(key, key, text, get_language(chat_id))
+	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+	m = msg.get_message("end_decypher", get_language(chat_id)) + context.chat_data["command"] + "."
+	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
 #Starting a mirror cipher session...
 async def trigger_mirror(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_mirror(0)
 	context.chat_data["command"] = "mirror"
-	logging.info(str(hide_id(id)) + " starts mirror conversation...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_1", get_language(id)), parse_mode=ParseMode.HTML)
+	logging.info(str(hide_id(chat_id)) + " starts mirror conversation...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("mirror_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return MIRROR_K
 
 #Asking for a mirror cipher key...
 async def mirror_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	text = update.message.text
 	context.chat_data["mirror_key"] = text
-	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_2", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("mirror_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return MIRROR_M
 
 #Recieving messages to encrypt...
 async def mirror_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_mirror(1)
 	text = update.message.text
 	key = context.chat_data["mirror_key"]
 	m = ""
 	try:
 		m = txt.mirror_cypher(key, text)
-		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-		m = msg.get_message("end_cypher", get_language(id)) + context.chat_data["command"] + "."
-		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+		m = msg.get_message("end_cypher", get_language(chat_id)) + context.chat_data["command"] + "."
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		return ConversationHandler.END
 	except:
-		await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_3", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("mirror_3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return MIRROR_M
 
 #Starting a mirror decipher session...
 async def trigger_de_mirror(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_de_mirror(0)
-	logging.info(str(hide_id(id)) + " starts de_mirror conversation...")
+	logging.info(str(hide_id(chat_id)) + " starts de_mirror conversation...")
 	context.chat_data["command"] = "de_mirror"
-	await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_1", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("mirror_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return D_MIRROR_K
 
 #Asking for a mirror decipher key...
 async def de_mirror_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	text = update.message.text
 	context.chat_data["mirror_key"] = text
-	await context.bot.send_message(chat_id=id, text=msg.get_message("d_mirror_2", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("d_mirror_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return D_MIRROR_M
 
 #Recieving messages to decrypt...
 async def de_mirror_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_de_mirror(1)
 	text = update.message.text
 	key = context.chat_data["mirror_key"]
 	m = ""
 	try:
 		m = txt.mirror_decypher(key, text)
-		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-		m = msg.get_message("end_decypher", get_language(id)) + context.chat_data["command"] + "."
-		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+		m = msg.get_message("end_decypher", get_language(chat_id)) + context.chat_data["command"] + "."
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		return ConversationHandler.END
 	except:
-		await context.bot.send_message(chat_id=id, text=msg.get_message("mirror_3", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("mirror_3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 		return D_MIRROR_M
 
 #Starting a Levenshtein session...
 async def trigger_levenshtein(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_levenshtein(0)
-	await context.bot.send_message(chat_id=id, text=msg.get_message("levenshtein_1", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("levenshtein_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return LEVENSHTEIN
 
 #Recieving messages to measure Levenshtein distance...
 async def levenshtein_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	us.add_levenshtein(1)
-	words = update.message.text.split(" ")
+	words = update.message.text.upper().split(" ")
 	if len(words) > 1:
 		if len(words) == 2:
 			d = txt.levenshtein_distance(words[0], words[1])
-			m = msg.levenshtein_distance_message(words[0], words[1], d, get_language(id))
-			await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+			m = msg.levenshtein_distance_message(words[0], words[1], d, get_language(chat_id))
+			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		else:
 			a = txt.levenshtein_analysis(words)
-			m = msg.levenshtein_analysis_message(words, a, get_language(id))
-			await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+			m = msg.levenshtein_analysis_message(words, a, get_language(chat_id))
+			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 	else:
-		await context.bot.send_message(chat_id=id, text=msg.get_message("levenshtein_2", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("levenshtein_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return LEVENSHTEIN 
 
 #Starting an error report session...
 async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " wants to report an error...")
-	await context.bot.send_message(chat_id=id, text=msg.get_apology(get_language(id)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_1", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " wants to report an error...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_apology(get_language(chat_id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_1", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return ERROR_1
 
 #Saving error related command...
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	m = update.message.text
 	context.chat_data["error_command"] = m
-	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_2", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return ERROR_2
 
 #Saving error description...
 async def report_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	m = context.chat_data["error_command"]
 	m2 = update.message.text
 	context.chat_data["error_description"] = m2
 	us.add_error_report()
-	us.save_error_report(m, m2, str(hide_id(id)))
+	us.save_error_report(m, m2, str(hide_id(chat_id)))
 	admin_msg = "Error reported:\n-command: " + m + "\n-description: " + m2
 	await context.bot.send_message(chat_id=config["admin_id"], text=admin_msg, parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_3", get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
+
+#Starting admin session...
+async def trigger_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	password = update.message.text.split(" ")
+	if len(password) > 1 and password[1] == config["password"]:
+		us.add_admin()
+		context.chat_data["admin_t"] = dt.now()
+		if get_language(chat_id) == 0:
+			keyboard = [[InlineKeyboardButton(text="Ver datos", callback_data="a_0"),
+									InlineKeyboardButton(text="Guardar datos", callback_data="a_1")]]
+		else:
+			keyboard = [[InlineKeyboardButton(text="Check usage", callback_data="a_0"),
+									InlineKeyboardButton(text="Save usage", callback_data="a_1")]]
+		reply = InlineKeyboardMarkup(keyboard)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("admin", get_language(chat_id)), reply_markup=reply, parse_mode=ParseMode.HTML)
+		return ADMIN
+	else:
+		logging.info(hide_id(chat_id) + " wanted to check bot usage data...")
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("intruder", get_language(chat_id)), parse_mode=ParseMode.HTML)
+		return ConversationHandler.END
 
 #Ending any convertation...
 async def end_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " endss a conversation...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("end_conversation", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " endss a conversation...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("end_conversation", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
 #Printing privacy command...
 async def print_privacy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " checked privacy policy...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("privacy", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " checked privacy policy...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("privacy", get_language(chat_id)), parse_mode=ParseMode.HTML)
 
 #Printing help command...
 async def print_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " asked for help...")
-	await context.bot.send_message(chat_id=id, text=msg.get_message("help", get_language(id)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=id, text=msg.get_message("help2", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " asked for help...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("help", get_language(chat_id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("help2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 
 #Getting user preffered language...
-def get_language(id):
+def get_language(chat_id):
 	if id in en_users:
 		return 1
 	else:
@@ -251,64 +273,71 @@ def get_language(id):
 
 #Setting up language for active user...
 async def select_language(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
-	logging.info(str(hide_id(id)) + " will set language...")
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " will set language...")
 	keyboard = [[InlineKeyboardButton(text="Español", callback_data="l_0"),
 				InlineKeyboardButton(text="English", callback_data="l_1")]]
 	reply = InlineKeyboardMarkup(keyboard)
-	await context.bot.send_message(chat_id=id, text=msg.get_message("language", get_language(id)), reply_markup=reply, parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language", get_language(chat_id)), reply_markup=reply, parse_mode=ParseMode.HTML)
 
 #Setting up language for active user...
 async def set_language(update: Update, context: ContextTypes.DEFAULT_TYPE, query) -> None:
-	id = update.effective_chat.id
+	chat_id = update.effective_chat.id
 	if query == "l_1":
-		logging.info("English is the language selected by " + str(hide_id(id)))
+		logging.info("English is the language selected by " + str(hide_id(chat_id)))
 		en_users.add(id)
-		await context.bot.send_message(chat_id=id, text=msg.get_message("language2", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language2", get_language(chat_id)), parse_mode=ParseMode.HTML)
 	else:
-		logging.info("Spanish is the language selected by " + str(hide_id(id)))
+		logging.info("Spanish is the language selected by " + str(hide_id(chat_id)))
 		en_users.discard(id)
-		await context.bot.send_message(chat_id=id, text=msg.get_message("language3", get_language(id)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language3", get_language(chat_id)), parse_mode=ParseMode.HTML)
 
 #Sending usage data...
 async def bot_usage(update, context):
-	id = update.effective_chat.id
-	m = update.message.text.split(" ")
-	if len(m) > 1 and m[1] == config["password"]:
-		m = us.build_usage_message()
-		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
-	else:
-		logging.info(hide_id(id) + " wanted to check bot usage data...")
-		await context.bot.send_message(chat_id=id, text=msg.get_message("intruder", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	m = us.build_usage_message()
+	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 
 #Saving usage data...
 async def save_usage(update, context):
-	id = update.effective_chat.id
-	m = update.message.text.split(" ")
-	if len(m) > 1 and m[1] == config["password"]:
-		us.save_usage()
-		await context.bot.send_message(chat_id=id, text="¡Datos guardados!", parse_mode=ParseMode.HTML)
-	else:
-		logging.info(hide_id(id) + " wanted to save bot usage data...")
-		await context.bot.send_message(chat_id=id, text=msg.get_message("intruder", get_language(id)), parse_mode=ParseMode.HTML)
+	chat_id = update.effective_chat.id
+	us.save_usage()
+	await context.bot.send_message(chat_id=chat_id, text="¡Datos guardados!", parse_mode=ParseMode.HTML)
 
 #Processing button clicks...
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	query = update.callback_query
-	query.answer()
+	await query.answer()
 	if query.data.startswith("l"):
 		await set_language(update, context, query.data)
 
+#Processing conversation button clicks...
+async def conversation_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	query = update.callback_query
+	await query.answer()
+	if query.data.startswith("a"):
+		if dt.now() - context.chat_data["admin_t"] < timedelta(minutes=5):
+			selection = int(query.data.split("_")[1])
+			if selection == 0:
+				await bot_usage(update, context)
+			elif selection == 1:
+				await save_usage(update, context)
+			return ADMIN
+		else:
+			chat_id = update.effective_chat.id
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("admin_end", get_language(chat_id)), parse_mode=ParseMode.HTML)
+			return ConversationHandler.END
+
 #Sending a message to the admin in case of any error...
 async def error_notification(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
-	m = "An error ocurred! While comunicating with chat " + str(hide_id(id))
+	chat_id = update.effective_chat.id
+	m = "An error ocurred! While comunicating with chat " + str(hide_id(chat_id))
 	logging.info(m)
 	await context.bot.send_message(chat_id=config["admin_id"], text=m, parse_mode=ParseMode.HTML)
 
 #Hiding the first numbers of a chat id for the log...
-def hide_id(id):
-	s = str(id)
+def hide_id(chat_id):
+	s = str(chat_id)
 	return "****" + s[len(s)-4:]
 
 #Building the conversation handler...
@@ -317,7 +346,8 @@ def build_conversation_handler():
 	handler = ConversationHandler(
 		entry_points=[CommandHandler("caesar", trigger_caesar), CommandHandler("de_caesar", trigger_de_caesar),
 					CommandHandler("mirror", trigger_mirror), CommandHandler("de_mirror", trigger_de_mirror),
-					CommandHandler("levenshtein", trigger_levenshtein), CommandHandler("error", trigger_error_submit)],
+					CommandHandler("levenshtein", trigger_levenshtein), CommandHandler("error", trigger_error_submit),
+					CommandHandler("admin", trigger_admin)],
 		states={
 			CAESAR_K: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_key)],
 			CAESAR_M: [MessageHandler(filters.TEXT & ~filters.COMMAND, caesar_message)],
@@ -330,6 +360,7 @@ def build_conversation_handler():
 			LEVENSHTEIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, levenshtein_message)],
 			ERROR_1: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_command)],
 			ERROR_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
+			ADMIN: [CallbackQueryHandler(conversation_button_click)],
 		},
 		fallbacks=[MessageHandler(filters.COMMAND, end_conversation)]
 		)
@@ -347,8 +378,6 @@ def main() -> None:
 	#app.add_error_handler(error_notification)
 	app.add_handler(CommandHandler("start", start), group=2)
 	app.add_handler(CommandHandler("language", select_language), group=2)
-	app.add_handler(CommandHandler("botusage", bot_usage), group=2)
-	app.add_handler(CommandHandler("saveusage", save_usage), group=2)
 	app.add_handler(CommandHandler("privacy", print_privacy), group=2)
 	app.add_handler(CommandHandler("help", print_help), group=2)
 	app.add_handler(CallbackQueryHandler(button_click), group=2)

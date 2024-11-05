@@ -20,6 +20,7 @@ class Usage():
 		self.error_reports = 0
 		self.language = [0,0] #spanish, english...
 		self.help = 0
+		self.admin = 0
 		self.outofcontext = 0
 		self.errors = 0
 
@@ -35,6 +36,7 @@ class Usage():
 			"error reports: " + str(self.error_reports) + "\n" + \
 			"language: " + str(self.language) + "\n" + \
 			"help: " + str(self.help) + "\n" + \
+			"admin: " + str(self.admin) + "\n" + \
 			"out of context: " + str(self.outofcontext) + "\n" + \
 			"errors: " + str(self.errors) + "\n"
 		return m
@@ -64,6 +66,7 @@ class Usage():
 		line += str(self.error_reports) + ";"
 		line += str(self.language) + ";"
 		line += str(self.help) + ";"
+		line += str(self.admin) + ";"
 		line += str(self.outofcontext) + ";"
 		line += str(self.errors) + "\n"
 		return line
@@ -103,6 +106,10 @@ class Usage():
 	#Registering a new help...
 	def add_help(self):
 		self.help += 1
+
+	#Registering a new admin...
+	def add_admin(self):
+		self.admin += 1
 	
 	#Registering an out of context message...
 	def add_outofcontext(self):
